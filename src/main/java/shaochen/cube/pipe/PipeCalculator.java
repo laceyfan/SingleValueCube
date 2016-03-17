@@ -72,7 +72,7 @@ public class PipeCalculator {
 		}
 		
 		//配置Spark上下文
-		String appName = (new StringBuilder("PipehashCube")).append(" -i " + inputPath).toString();
+		String appName = (new StringBuilder("PipeCube")).append(" -i " + inputPath).toString();
 		JavaSparkContext context = new JavaSparkContext(new SparkConf().setAppName(appName));
 		
 		//加载并解析文本数据
