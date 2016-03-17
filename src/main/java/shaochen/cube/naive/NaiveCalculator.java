@@ -102,7 +102,7 @@ public class NaiveCalculator {
 		});
 		
 		//保存最终的Cube
-		result.saveAsTextFile(cmd.getOptionValue("o"));
+		result.saveAsObjectFile(cmd.getOptionValue("o"));
 		context.close();
 	}
 

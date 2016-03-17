@@ -122,7 +122,7 @@ public class BatchCalculator {
 					return v1 + v2;
 				}
 			
-			}).saveAsTextFile(cmd.getOptionValue("o") + "/" + pipeline.getValue().getMark());
+			}).saveAsObjectFile(cmd.getOptionValue("o") + "/" + pipeline.getValue().getMark());
 
 			//进入下一个批次
 			bPipeline.destroy();
