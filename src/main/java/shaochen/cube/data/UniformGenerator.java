@@ -49,6 +49,7 @@ public class UniformGenerator {
 			case 4: UniformGenerator.create4D(pw); break;
 			case 5: UniformGenerator.create5D(pw); break;
 			case 6: UniformGenerator.create6D(pw); break;
+			case 7: UniformGenerator.create7D(pw); break;
 			default: UniformGenerator.printHelp(options);
 		}
 		pw.close();
@@ -98,6 +99,24 @@ public class UniformGenerator {
 						for (int e = 1; e <= 10; e++) {
 							for (int f = 1; f <= 100; f++) {
 								pw.println(String.format("%d|%d|%d|%d|%d|%d|1|", a, b, c, d, e, f));
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	private static void create7D(PrintWriter pw) {
+		for (int a = 1; a <= 10; a++) {
+			for (int b = 1; b <= 10; b++) {
+				for (int c = 1; c <= 10; c++) {
+					for (int d = 1; d <= 10; d++) {
+						for (int e = 1; e <= 10; e++) {
+							for (int f = 1; f <= 10; f++) {
+								for (int g = 1; g <= 10; g++) {
+									pw.println(String.format("%d|%d|%d|%d|%d|%d|%d|1|", a, b, c, d, e, f, g));
+								}
 							}
 						}
 					}
