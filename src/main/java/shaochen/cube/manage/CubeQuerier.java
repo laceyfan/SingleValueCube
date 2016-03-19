@@ -15,9 +15,9 @@ import org.apache.spark.api.java.function.Function;
 import org.apache.spark.broadcast.Broadcast;
 
 import scala.Tuple2;
-import shaochen.cube.pipe.plan.BinaryTree;
-import shaochen.cube.pipe.plan.Cuboid;
-import shaochen.cube.pipe.plan.PlanIO;
+import shaochen.cube.plan.BinaryTree;
+import shaochen.cube.plan.Cuboid;
+import shaochen.cube.plan.PlanIO;
 
 /**
  * 提供对Cube的查询功能。

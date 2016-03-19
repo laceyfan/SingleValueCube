@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import scala.Tuple2;
-import shaochen.cube.pipe.plan.BinaryTree;
-import shaochen.cube.pipe.plan.Cuboid;
+import shaochen.cube.plan.BinaryTree;
+import shaochen.cube.plan.Cuboid;
 import shaochen.cube.util.Member;
 
 /**

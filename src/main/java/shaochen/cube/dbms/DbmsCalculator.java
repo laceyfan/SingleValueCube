@@ -101,7 +101,7 @@ public class DbmsCalculator {
 					return v1 + v2;
 				}
 			
-			}).saveAsObjectFile(outputDir + toMark); //保存最终的Cube
+			}).saveAsTextFile(outputDir + toMark); //保存最终的Cube
 			bToMark.destroy();
 		}
 		

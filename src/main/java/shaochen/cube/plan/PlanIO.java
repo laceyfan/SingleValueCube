@@ -1,4 +1,4 @@
-package shaochen.cube.pipe.plan;
+package shaochen.cube.plan;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

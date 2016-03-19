@@ -22,9 +22,9 @@ import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.storage.StorageLevel;
 
 import scala.Tuple2;
-import shaochen.cube.pipe.plan.BinaryTree;
-import shaochen.cube.pipe.plan.Cuboid;
-import shaochen.cube.pipe.plan.PlanIO;
+import shaochen.cube.plan.BinaryTree;
+import shaochen.cube.plan.Cuboid;
+import shaochen.cube.plan.PlanIO;
 import shaochen.cube.util.Member;
 
 /**
@@ -123,7 +123,7 @@ public class PipeCalculator {
 					return v1 + v2;
 				}
 			
-			}).saveAsObjectFile(outputDir + pipeline.getValue().getMark());
+			}).saveAsTextFile(outputDir + pipeline.getValue().getMark());
 			
 			//进入下一条pipeline
 			bPipeline.destroy();
@@ -160,7 +160,7 @@ public class PipeCalculator {
 					return new HashbasedExecutor(bPipeline.value()).generatePartialCube(t._2());
 				}
 				
-			}).saveAsObjectFile(outputDir + pipeline.getValue().getMark());
+			}).saveAsTextFile(outputDir + pipeline.getValue().getMark());
 			
 			//进入下一个pipeline
 			bDivision.destroy();

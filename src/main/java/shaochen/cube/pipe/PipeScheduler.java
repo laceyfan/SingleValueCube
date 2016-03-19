@@ -15,9 +15,9 @@ import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 
-import shaochen.cube.pipe.plan.BinaryTree;
-import shaochen.cube.pipe.plan.LatticeSampler;
-import shaochen.cube.pipe.plan.PlanIO;
+import shaochen.cube.plan.BinaryTree;
+import shaochen.cube.plan.LatticeSampler;
+import shaochen.cube.plan.PlanIO;
 import shaochen.cube.util.MetaInfo;
 
 /**
@@ -59,7 +59,7 @@ public class PipeScheduler {
 
 		Map<Integer, Long> cuboids = LatticeSampler.estimateCuboidSize(context, inputPath, dimensionCount); //估算格点成本
 		long threshold = PipeScheduler.calculateDivisionThreshold(inputPath); //计算炸裂阈值
-		BinaryTree<shaochen.cube.pipe.plan.Cuboid> pipelines = LineCluster.createPipeLines(cuboids, threshold); //生成pipelines划分方案
+		BinaryTree<shaochen.cube.plan.Cuboid> pipelines = LineCluster.createPipeLines(cuboids, threshold); //生成pipelines划分方案
 
 		//保存Cube生成的执行计划
 		try {
