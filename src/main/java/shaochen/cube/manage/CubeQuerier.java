@@ -1,7 +1,5 @@
 package shaochen.cube.manage;
 
-import java.lang.reflect.Member;
-
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
@@ -18,6 +16,7 @@ import scala.Tuple2;
 import shaochen.cube.plan.BinaryTree;
 import shaochen.cube.plan.Cuboid;
 import shaochen.cube.plan.PlanIO;
+import shaochen.cube.util.Member;
 
 /**
  * 提供对Cube的查询功能。
@@ -66,7 +65,7 @@ public class CubeQuerier {
 		//配置Spark上下文
 		String appName = (new StringBuilder("PipeCube")).append(" -i " + inputPath).toString();
 		JavaSparkContext context = new JavaSparkContext(new SparkConf().setAppName(appName));
-		JavaPairRDD<Member, Long> view = context.sequenceFile(inputPath, Member.class, Long.class);
+		JavaPairRDD<Member, Long> view = context.textFile(inputPath).mapToPair(new RecordParser());
 		
 		//解析条件，执行过滤
 		String condition = cmd.getOptionValue("c");

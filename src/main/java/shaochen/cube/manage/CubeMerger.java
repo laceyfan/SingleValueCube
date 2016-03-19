@@ -1,7 +1,6 @@
 package shaochen.cube.manage;
 
 import java.io.IOException;
-import java.lang.reflect.Member;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -17,6 +16,8 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function2;
+
+import shaochen.cube.util.Member;
 
 /**
  * 提供合并两个Cube的功能。
@@ -54,6 +55,7 @@ public class CubeMerger {
 		//配置Spark上下文
 		String appName = (new StringBuilder("CubeMerger")).append(" -i1 " + inputPath1).append(" -i2 " + inputPath2).toString();
 		JavaSparkContext context = new JavaSparkContext(new SparkConf().setAppName(appName));
+		int parallelism = context.getConf().getInt("spark.default.parallelism", 20);
 		
 		//逐个合并子Cube
 		Path p = new Path(inputPath1);
@@ -62,8 +64,8 @@ public class CubeMerger {
 			String mark = dir.getName();
 			
 			//加载数据
-			JavaPairRDD<Member, Long> cube1 = context.sequenceFile(inputPath1 + mark, Member.class, Long.class);
-			JavaPairRDD<Member, Long> cube2 = context.sequenceFile(inputPath2 + mark, Member.class, Long.class);
+			JavaPairRDD<Member, Long> cube1 = context.textFile(inputPath1 + mark, parallelism).mapToPair(new RecordParser());
+			JavaPairRDD<Member, Long> cube2 = context.textFile(inputPath2 + mark, parallelism).mapToPair(new RecordParser());
 			
 			//聚合方体
 			cube1.union(cube2).reduceByKey(new Function2<Long, Long, Long>() {
