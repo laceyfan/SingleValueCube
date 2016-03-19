@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import shaochen.cube.plan.BinaryTree;
-import shaochen.cube.plan.Cuboid;
+import shaochen.cube.pipe.plan.BinaryTree;
+import shaochen.cube.pipe.plan.Cuboid;
 
 /**
  * 提供将搜索格划分为多个pipeline的功能，各批次内格点共享排序成本。

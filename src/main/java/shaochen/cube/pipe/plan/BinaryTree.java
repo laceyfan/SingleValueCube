@@ -1,4 +1,4 @@
-package shaochen.cube.plan;
+package shaochen.cube.pipe.plan;
 
 import java.io.Serializable;
 

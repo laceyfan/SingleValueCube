@@ -22,9 +22,9 @@ import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.storage.StorageLevel;
 
 import scala.Tuple2;
-import shaochen.cube.plan.BinaryTree;
-import shaochen.cube.plan.Cuboid;
-import shaochen.cube.plan.PlanIO;
+import shaochen.cube.pipe.plan.BinaryTree;
+import shaochen.cube.pipe.plan.Cuboid;
+import shaochen.cube.pipe.plan.PlanIO;
 import shaochen.cube.util.Member;
 
 /**
