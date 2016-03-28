@@ -51,7 +51,7 @@ public class UniformData {
 			UniformData.printHelp(options);
 			return;
 		}
-		String className = "UniformGenerator" + cmd.getOptionValue("s").toUpperCase();
+		String className = "shaochen.cube.data.UniformGenerator" + cmd.getOptionValue("s").toUpperCase();
 		int dimensionCount = Integer.parseInt(cmd.getOptionValue("d"));
 		String outputPath = cmd.getOptionValue("o");
 
