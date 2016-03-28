@@ -123,7 +123,7 @@ public class PipeCalculator {
 					return v1 + v2;
 				}
 			
-			}).saveAsTextFile(outputDir + pipeline.getValue().getMark());
+			}).saveAsObjectFile(outputDir + pipeline.getValue().getMark());
 			
 			//进入下一条pipeline
 			bPipeline.destroy();
@@ -160,7 +160,7 @@ public class PipeCalculator {
 					return new HashbasedExecutor(bPipeline.value()).generatePartialCube(t._2());
 				}
 				
-			}).saveAsTextFile(outputDir + pipeline.getValue().getMark());
+			}).saveAsObjectFile(outputDir + pipeline.getValue().getMark());
 			
 			//进入下一个pipeline
 			bDivision.destroy();
