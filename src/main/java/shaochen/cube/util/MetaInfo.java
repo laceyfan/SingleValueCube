@@ -23,6 +23,11 @@ public class MetaInfo {
 	public static long DIVISION_SIZE = 64;
 	
 	/**
+	 * 集群可用的CPU核数。
+	 */
+	public static int CORE_COUNT = 20;
+	
+	/**
 	 * 1MB = 1024*1024Byte。
 	 */
 	public static final long MB_TO_BYTE = 1 << 20;
