@@ -9,6 +9,11 @@ import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.util.Map;
 
+/**
+ * 提供搜索格在本地的加载和存储的功能。
+ * @author Shaochen
+ *
+ */
 public class LatticeIO {
 	
 	/**
