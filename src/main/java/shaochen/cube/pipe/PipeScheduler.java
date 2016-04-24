@@ -1,6 +1,9 @@
 package shaochen.cube.pipe;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.Map;
 
 import org.apache.commons.cli.BasicParser;
@@ -37,8 +40,9 @@ public class PipeScheduler {
 	private static void printHelp(Options options) {
 		new HelpFormatter().printHelp("java -cp SingleValueCube.jar shaochen.cube.pipe.PipeScheduler", options);
 	}
-	
-	public static void main(String[] args) {
+
+	@SuppressWarnings("unchecked")
+	public static void main(String[] args) throws FileNotFoundException, IOException, ClassNotFoundException {
 		//解析命令行参数
 		Options options = PipeScheduler.createCmdOptions();
 		CommandLine cmd = null;
@@ -57,7 +61,21 @@ public class PipeScheduler {
 		SparkConf conf = new SparkConf().setAppName(appName.toString());
 		JavaSparkContext context = new JavaSparkContext(conf);
 
-		Map<Integer, Long> cuboids = LatticeSampler.estimateCuboidSize(context, inputPath, dimensionCount); //估算格点成本
+		//读取执行计划
+		Map<Integer, Long> cuboids = null;
+		if (inputPath.startsWith("hdfs://")) {
+			cuboids = LatticeSampler.estimateCuboidSize(context, inputPath, dimensionCount); //估算格点成本
+		} else {
+			ObjectInputStream in = null;
+			try {
+				in = new ObjectInputStream(new FileInputStream(inputPath));
+				cuboids = (Map<Integer, Long>) in.readObject();
+			} finally {
+				in.close();
+			}			
+		}
+		
+		//划分搜索格
 		long threshold = PipeScheduler.calculateDivisionThreshold(inputPath); //计算炸裂阈值
 		BinaryTree<shaochen.cube.plan.Cuboid> pipelines = LineCluster.createPipeLines(cuboids, threshold); //生成pipelines划分方案
 
@@ -85,7 +103,7 @@ public class PipeScheduler {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return Math.max(length / MetaInfo.DIVISION_SIZE + 1, 20L);
+		return Math.max(length / MetaInfo.DIVISION_SIZE + 1, MetaInfo.CORE_COUNT);
 	}
 
 }
