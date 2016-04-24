@@ -11,15 +11,12 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.Function2;
-import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.api.java.function.Function;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.storage.StorageLevel;
 
-import scala.Tuple2;
 import shaochen.cube.util.MarkEnumeration;
 import shaochen.cube.util.Member;
 import shaochen.cube.util.MetaInfo;
@@ -49,16 +46,13 @@ public class LatticeSampler {
 		//解析数据并缓存
 		final Broadcast<Integer> bWidth = context.broadcast(dimensionCount);
 		final Broadcast<Integer> bFromMark = context.broadcast((int) Math.pow(2, dimensionCount) - 1);
-		JavaPairRDD<Member, Long> table = lines.mapToPair(new PairFunction<String, Member, Long>() {
+		JavaRDD<Member> table = lines.map(new Function<String, Member>() {
 
 			private static final long serialVersionUID = 1L;
 
-			public Tuple2<Member, Long> call(String t) throws Exception {
+			public Member call(String t) throws Exception {
 				String[] fields = t.split("\\|");
-				int width = bWidth.value();
-				Member member = new Member(Arrays.copyOf(fields, width), bFromMark.value());
-				long quantity = Long.parseLong(fields[width]);
-				return new Tuple2<Member, Long>(member, quantity);
+				return new Member(Arrays.copyOf(fields, bWidth.value()), bFromMark.value());
 			}
 			
 		}).persist(StorageLevel.MEMORY_AND_DISK());
@@ -70,24 +64,15 @@ public class LatticeSampler {
 			
 			//按照给定的标记，执行一次聚集
 			final Broadcast<Integer> bToMark = context.broadcast(toMark);
-			long size = table.mapToPair(new PairFunction<Tuple2<Member, Long>, Member, Long>() {
+			long size = table.map(new Function<Member, Member>() {
 
 				private static final long serialVersionUID = 1L;
 
-				public Tuple2<Member, Long> call(Tuple2<Member, Long> t) throws Exception {
-					Member m = t._1().clone().reset(bToMark.value());
-					return new Tuple2<Member, Long>(m, t._2());
+				public Member call(Member t) throws Exception {
+					return t.clone().reset(bToMark.value());
 				}
 			
-			}).reduceByKey(new Function2<Long, Long, Long>() {
-
-				private static final long serialVersionUID = 1L;
-
-				public Long call(Long v1, Long v2) throws Exception {
-					return v1 + v2;
-				}
-			
-			}).count();
+			}).distinct().count();
 			bToMark.destroy();
 			
 			map.put(toMark, size);
