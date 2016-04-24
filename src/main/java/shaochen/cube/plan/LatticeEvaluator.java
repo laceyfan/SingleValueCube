@@ -25,6 +25,11 @@ import org.apache.spark.storage.StorageLevel;
 import shaochen.cube.util.MarkEnumeration;
 import shaochen.cube.util.Member;
 
+/**
+ * 提供统计给定数据集搜索格上各点的空间成本的功能。
+ * @author Shaochen
+ *
+ */
 public class LatticeEvaluator {
 
 	private static Options createCmdOptions() {
