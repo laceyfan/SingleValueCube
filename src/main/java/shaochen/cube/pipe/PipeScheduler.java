@@ -1,9 +1,7 @@
 package shaochen.cube.pipe;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.Map;
 
 import org.apache.commons.cli.BasicParser;
@@ -19,6 +17,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 
 import shaochen.cube.plan.BinaryTree;
+import shaochen.cube.plan.LatticeIO;
 import shaochen.cube.plan.LatticeSampler;
 import shaochen.cube.plan.PlanIO;
 import shaochen.cube.util.MetaInfo;
@@ -41,7 +40,6 @@ public class PipeScheduler {
 		new HelpFormatter().printHelp("java -cp SingleValueCube.jar shaochen.cube.pipe.PipeScheduler", options);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static void main(String[] args) throws FileNotFoundException, IOException, ClassNotFoundException {
 		//解析命令行参数
 		Options options = PipeScheduler.createCmdOptions();
@@ -66,13 +64,7 @@ public class PipeScheduler {
 		if (inputPath.startsWith("hdfs://")) {
 			cuboids = LatticeSampler.estimateCuboidSize(context, inputPath, dimensionCount); //估算格点成本
 		} else {
-			ObjectInputStream in = null;
-			try {
-				in = new ObjectInputStream(new FileInputStream(inputPath));
-				cuboids = (Map<Integer, Long>) in.readObject();
-			} finally {
-				in.close();
-			}			
+			cuboids = LatticeIO.loadFrom(inputPath);
 		}
 		
 		//划分搜索格
