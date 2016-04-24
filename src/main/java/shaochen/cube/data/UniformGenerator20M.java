@@ -3,15 +3,15 @@ package shaochen.cube.data;
 import java.io.PrintWriter;
 
 /**
- * 提供生成1亿条均匀数据集的功能。
+ * 提供生成5000万条均匀数据集的功能。
  * @author Shaochen
  *
  */
-public class UniformGenerator100M implements IDataGenerator {
+public class UniformGenerator20M implements IDataGenerator {
 	
 	public void create3D(PrintWriter pw) {
 		for (int a = 1; a <= 100; a++) {
-			for (int b = 1; b <= 1000; b++) {
+			for (int b = 1; b <= 200; b++) {
 				for (int c = 1; c <= 1000; c++) {
 					pw.println(String.format("%d|%d|%d|1|", a, b, c));
 				}
@@ -21,7 +21,7 @@ public class UniformGenerator100M implements IDataGenerator {
 
 	public void create4D(PrintWriter pw) {
 		for (int a = 1; a <= 10; a++) {
-			for (int b = 1; b <= 100; b++) {
+			for (int b = 1; b <= 20; b++) {
 				for (int c = 1; c <= 100; c++) {
 					for (int d = 1; d <= 1000; d++) {
 						pw.println(String.format("%d|%d|%d|%d|1|", a, b, c, d));
@@ -34,7 +34,7 @@ public class UniformGenerator100M implements IDataGenerator {
 	public void create5D(PrintWriter pw) {
 		for (int a = 1; a <= 10; a++) {
 			for (int b = 1; b <= 10; b++) {
-				for (int c = 1; c <= 100; c++) {
+				for (int c = 1; c <= 20; c++) {
 					for (int d = 1; d <= 100; d++) {
 						for (int e = 1; e <= 100; e++) {
 							pw.println(String.format("%d|%d|%d|%d|%d|1|", a, b, c, d, e));
@@ -50,7 +50,7 @@ public class UniformGenerator100M implements IDataGenerator {
 			for (int b = 1; b <= 10; b++) {
 				for (int c = 1; c <= 10; c++) {
 					for (int d = 1; d <= 10; d++) {
-						for (int e = 1; e <= 100; e++) {
+						for (int e = 1; e <= 20; e++) {
 							for (int f = 1; f <= 100; f++) {
 								pw.println(String.format("%d|%d|%d|%d|%d|%d|1|", a, b, c, d, e, f));
 							}
@@ -68,7 +68,7 @@ public class UniformGenerator100M implements IDataGenerator {
 					for (int d = 1; d <= 10; d++) {
 						for (int e = 1; e <= 10; e++) {
 							for (int f = 1; f <= 10; f++) {
-								for (int g = 1; g <= 100; g++) {
+								for (int g = 1; g <= 20; g++) {
 									pw.println(String.format("%d|%d|%d|%d|%d|%d|%d|1|", a, b, c, d, e, f, g));
 								}
 							}
