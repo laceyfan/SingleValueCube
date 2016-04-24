@@ -15,6 +15,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.broadcast.Broadcast;
+import org.apache.spark.storage.StorageLevel;
 
 import scala.Tuple2;
 import shaochen.cube.util.MarkEnumeration;
@@ -73,7 +74,7 @@ public class DbmsCalculator {
 				return new Tuple2<Member, Long>(member, quantity);
 			}
 					
-		});
+		}).persist(StorageLevel.MEMORY_AND_DISK());
 
 		//逐个计算格点
 		Enumeration<Integer> enu = new MarkEnumeration(dimensionCount);
