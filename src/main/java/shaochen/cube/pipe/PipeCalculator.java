@@ -43,7 +43,7 @@ public class PipeCalculator {
 	}
 	
 	private static void printHelp(Options options) {
-		new HelpFormatter().printHelp("java -cp SingleValueCube.jar shaochen.cube.batch.PipeCalculator", options);
+		new HelpFormatter().printHelp("java -cp SingleValueCube.jar shaochen.cube.pipe.PipeCalculator", options);
 	}
 	
 	public static void main(String[] args) {
