@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -64,7 +63,7 @@ public class LatticeEvaluator {
 		
 		//配置采样参数
 		int parallelism = context.getConf().getInt("spark.default.parallelism", 20);
-		JavaRDD<String> lines = context.textFile(inputPath, parallelism).sample(false, 1.0, new Random().nextInt());
+		JavaRDD<String> lines = context.textFile(inputPath, parallelism);
 		
 		//解析数据并缓存
 		final Broadcast<Integer> bWidth = context.broadcast(dimensionCount);
