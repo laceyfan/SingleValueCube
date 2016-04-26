@@ -11,7 +11,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.broadcast.Broadcast;
@@ -75,16 +74,16 @@ public class BucCalculator {
 		int parallelism = context.getConf().getInt("spark.default.parallelism", 20);
 		final Broadcast<Integer> bWidth = context.broadcast(dimensionCount);
 		final Broadcast<Integer> bFromMark = context.broadcast((int) Math.pow(2, dimensionCount) - 1);
-		JavaPairRDD<Member, Long> table = context.textFile(cmd.getOptionValue("i"), parallelism).mapToPair(new PairFunction<String, Member, Long>() {
+		JavaPairRDD<Member, Tuple2<Member, Long>> table = context.textFile(cmd.getOptionValue("i"), parallelism).mapToPair(new PairFunction<String, Member, Tuple2<Member, Long>>() {
 
 			private static final long serialVersionUID = 1L;
 
-			public Tuple2<Member, Long> call(String t) throws Exception {
+			public Tuple2<Member, Tuple2<Member, Long>> call(String t) throws Exception {
 				String[] fields = t.split("\\|");
 				int width = bWidth.value();
 				Member member = new Member(Arrays.copyOf(fields, width), bFromMark.value());
 				long quantity = Long.parseLong(fields[width]);
-				return new Tuple2<Member, Long>(member, quantity);
+				return new Tuple2<Member, Tuple2<Member, Long>>(member, new Tuple2<Member, Long>(member, quantity));
 			}
 
 		});
@@ -94,41 +93,41 @@ public class BucCalculator {
 		context.close();
 	}
 	
-	private static void preOrderTraverse(JavaSparkContext context, JavaPairRDD<Member, Long> input, BinaryTree<Cuboid> node, String outputDir) {
+	private static void preOrderTraverse(JavaSparkContext context, JavaPairRDD<Member, Tuple2<Member, Long>> input, BinaryTree<Cuboid> node, String outputDir) {
 		if (node == null) {
 			return;
 		}
 		
 		//计算当前格点的聚集结果
 		final Broadcast<Integer> bToMark = context.broadcast(node.getValue().getMark());
-		JavaPairRDD<Member, Long> output = input.mapToPair(new PairFunction<Tuple2<Member, Long>, Member, Long>() {
+		JavaPairRDD<Member, Tuple2<Member, Long>> output = input.mapToPair(new PairFunction<Tuple2<Member, Tuple2<Member, Long>>, Member, Tuple2<Member, Long>>() {
 
 			private static final long serialVersionUID = 1L;
 
-			public Tuple2<Member, Long> call(Tuple2<Member, Long> t) throws Exception {
-				Member member = t._1().clone().reset(bToMark.value());
-				Long quantity = t._2();
-				return new Tuple2<Member, Long>(member, quantity);
-			}
-			
-		}).reduceByKey(new Function2<Long, Long, Long>() {
-
-			private static final long serialVersionUID = 1L;
-
-			public Long call(Long v1, Long v2) throws Exception {
-				return v1 + v2;
-			}
-			
-		}).filter(new Function<Tuple2<Member, Long>, Boolean>() { //剪枝
-
-			private static final long serialVersionUID = 1L;
-
-			public Boolean call(Tuple2<Member, Long> v) throws Exception {
-				return v._2() > 0;
+			public Tuple2<Member, Tuple2<Member, Long>> call(Tuple2<Member, Tuple2<Member, Long>> t) throws Exception {
+				Member key = t._2()._1().clone().reset(bToMark.value());
+				return new Tuple2<Member, Tuple2<Member, Long>>(key, t._2());
 			}
 			
 		}).persist(StorageLevel.MEMORY_AND_DISK());
-		output.saveAsObjectFile(outputDir + node.getValue().getMark());
+		
+		output.reduceByKey(new Function2<Tuple2<Member, Long>, Tuple2<Member, Long>, Tuple2<Member, Long>>() {
+
+			private static final long serialVersionUID = 1L;
+
+			public Tuple2<Member, Long> call(Tuple2<Member, Long> v1, Tuple2<Member, Long> v2) throws Exception {
+				return new Tuple2<Member, Long>(v1._1(), v1._2() + v2._2());
+			}
+			
+		}).mapToPair(new PairFunction<Tuple2<Member, Tuple2<Member, Long>>, Member, Long>() {
+
+			private static final long serialVersionUID = 1L;
+
+			public Tuple2<Member, Long> call(Tuple2<Member, Tuple2<Member, Long>> t) throws Exception {
+				return new Tuple2<Member, Long>(t._1(), t._2()._2());
+			}
+			
+		}).saveAsObjectFile(outputDir + node.getValue().getMark());
 
 		//执行其余格点
 		BucCalculator.preOrderTraverse(context, output, node.getLeft(), outputDir); //先执行子节点
