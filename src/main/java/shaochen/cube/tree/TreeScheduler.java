@@ -34,7 +34,7 @@ public class TreeScheduler {
 	}
 	
 	private static void printHelp(Options options) {
-		new HelpFormatter().printHelp("java -cp SingleValueCube.jar shaochen.cube.buc.BucScheduler", options);
+		new HelpFormatter().printHelp("java -cp SingleValueCube.jar shaochen.cube.tree.TreeScheduler", options);
 	}
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, ClassNotFoundException {

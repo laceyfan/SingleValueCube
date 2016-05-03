@@ -38,7 +38,7 @@ public class TreeCalculator {
 	}
 	
 	private static void printHelp(Options options) {
-		new HelpFormatter().printHelp("java -cp SingleValueCube.jar shaochen.cube.buc.BucCalculator", options);
+		new HelpFormatter().printHelp("java -cp SingleValueCube.jar shaochen.cube.tree.TreeCalculator", options);
 	}
 	
 	public static void main(String[] args) {
@@ -67,7 +67,7 @@ public class TreeCalculator {
 		}
 		
 		//配置Spark上下文
-		String appName = (new StringBuilder("BucCube")).append(" -i " + inputPath).toString();
+		String appName = (new StringBuilder("TreeCube")).append(" -i " + inputPath).toString();
 		JavaSparkContext context = new JavaSparkContext(new SparkConf().setAppName(appName));
 
 		//加载并解析文本数据
