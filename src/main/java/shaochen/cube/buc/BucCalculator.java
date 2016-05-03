@@ -1,9 +1,7 @@
 package shaochen.cube.buc;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -15,7 +13,6 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.broadcast.Broadcast;
 
@@ -101,9 +98,9 @@ public class BucCalculator {
 			return;
 		}
 		
-		//重置维度值
+		//执行聚集计算
 		final Broadcast<Integer> bToMark = context.broadcast(node.getValue().getMark());
-		JavaPairRDD<Member, Long> temp = input.mapToPair(new PairFunction<Tuple2<Member, Long>, Member, Long>() {
+		List<Tuple2<Member, Long>> filtered = input.mapToPair(new PairFunction<Tuple2<Member, Long>, Member, Long>() {
 
 			private static final long serialVersionUID = 1L;
 
@@ -112,47 +109,41 @@ public class BucCalculator {
 				return new Tuple2<Member, Long>(m, t._2());
 			}
 			
-		}).cache();
-		bToMark.destroy();
-
-		//获取无效分区
-		final List<Member> filtered = new LinkedList<Member>();
-		temp.reduceByKey(new Function2<Long, Long, Long>() {
-
-			private static final long serialVersionUID = 1L;
-
-			public Long call(Long v1, Long v2) throws Exception {
-				return v1 + v2;
-			}
-			
-		}).collect().forEach(new Consumer<Tuple2<Member, Long>>() {
-
-			public void accept(Tuple2<Member, Long> t) {
-				if (t._2() > 0L) {
-					filtered.add(t._1());
-				}
-			}
-			
-		});
-
-		//过滤无效分区
-		final Broadcast<List<Member>> bfiltered = context.broadcast(filtered);
-		JavaPairRDD<Member, Long> output = temp.filter(new Function<Tuple2<Member, Long>, Boolean>() {
+		}).filter(new Function<Tuple2<Member, Long>, Boolean>() {
 
 			private static final long serialVersionUID = 1L;
 
 			public Boolean call(Tuple2<Member, Long> t) throws Exception {
-				return bfiltered.value().equals(t._1());
+				return t._2() > 0L;
+			}
+			
+		}).collect();
+		bToMark.destroy();
+		
+		//保存聚集结果
+		context.parallelizePairs(filtered).saveAsObjectFile(outputDir + "/" + node.getValue().getMark());
+
+		//过滤无效分区
+		final Broadcast<List<Tuple2<Member, Long>>> bfiltered = context.broadcast(filtered);
+		JavaPairRDD<Member, Long> data = input.filter(new Function<Tuple2<Member, Long>, Boolean>() {
+
+			private static final long serialVersionUID = 1L;
+
+			public Boolean call(Tuple2<Member, Long> t) throws Exception {
+				List<Tuple2<Member, Long>> list = bfiltered.value();
+				for (Tuple2<Member, Long> element : list) {
+					if (element._1().equals(t._1())) {
+						return true;
+					}
+				}
+				return false;
 			}
 			
 		}).cache();
 		bfiltered.destroy();
-		temp.unpersist();
-		output.saveAsObjectFile(outputDir + node.getValue().getMark());
 
 		//执行其余格点
-		BucCalculator.preOrderTraverse(context, output, node.getLeft(), outputDir); //先执行子节点
-		output.unpersist();
+		BucCalculator.preOrderTraverse(context, data, node.getLeft(), outputDir); //先执行子节点
 		BucCalculator.preOrderTraverse(context, input, node.getRight(), outputDir); //执行兄弟节点
 	}
 
