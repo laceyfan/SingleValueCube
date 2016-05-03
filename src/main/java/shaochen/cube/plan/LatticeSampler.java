@@ -157,7 +157,7 @@ public class LatticeSampler {
 	private static Options createCmdOptions() {
 		Option input = new Option("i", true, "数据文件路径"); input.setArgName("inputPath");
 		Option dims = new Option("d", true, "维度数量"); dims.setArgName("dimensionCount");
-		Option full = new Option("d", false, "全量加载");
+		Option full = new Option("f", false, "全量加载");
 		Option output = new Option("o", true, "结果保存路径"); output.setArgName("outputPath");
 		return new Options().addOption(input).addOption(dims).addOption(full).addOption(output);
 	}
