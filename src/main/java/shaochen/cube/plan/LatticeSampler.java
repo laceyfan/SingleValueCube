@@ -181,7 +181,7 @@ public class LatticeSampler {
 		int dimensionCount = Integer.parseInt(cmd.getOptionValue("d"));
 
 		//配置Spark上下文
-		StringBuilder appName = new StringBuilder("PipeScheduler").append(" -i " + inputPath);
+		StringBuilder appName = new StringBuilder("LatticeSampler").append(" -i " + inputPath);
 		SparkConf conf = new SparkConf().setAppName(appName.toString());
 		JavaSparkContext context = new JavaSparkContext(conf);
 
