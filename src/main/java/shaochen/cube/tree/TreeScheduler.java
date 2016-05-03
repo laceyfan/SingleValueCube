@@ -57,7 +57,7 @@ public class TreeScheduler {
 		unused.sort(new Comparator<Entry<Integer, Long>>() {
 
 			public int compare(Entry<Integer, Long> o1, Entry<Integer, Long> o2) { //保证父格点始终在子格点前
-				return o1.getKey().compareTo(o2.getKey());
+				return o2.getKey().compareTo(o1.getKey());
 			}
 			
 		});
@@ -69,7 +69,7 @@ public class TreeScheduler {
 		while (unused.size() > 0) {
 			BinaryTree<Cuboid> node = new BinaryTree<Cuboid>(new Cuboid(unused.remove(0)));
 			for (BinaryTree<Cuboid> element : used) {
-				if (element.getValue().isChildOf(node.getValue())) { //添加到父格点的子树下
+				if (node.getValue().isChildOf(element.getValue())) { //添加到父格点的子树下
 					if (element.getLeft() == null) {
 						element.setLeft(node);
 					} else {

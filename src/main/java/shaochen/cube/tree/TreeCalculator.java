@@ -123,6 +123,7 @@ public class TreeCalculator {
 		//执行其余格点
 		TreeCalculator.preOrderTraverse(context, output, node.getLeft(), outputDir); //先执行子节点
 		output.unpersist();
+		bToMark.destroy();
 		TreeCalculator.preOrderTraverse(context, input, node.getRight(), outputDir); //执行兄弟节点
 	}
 
