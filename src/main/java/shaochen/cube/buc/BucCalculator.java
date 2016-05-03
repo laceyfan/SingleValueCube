@@ -121,7 +121,7 @@ public class BucCalculator {
 		bToMark.destroy();
 		
 		//保存聚集结果
-		context.parallelizePairs(filtered).saveAsObjectFile(outputDir + "/" + node.getValue().getMark());
+		context.parallelizePairs(filtered).saveAsObjectFile(outputDir + node.getValue().getMark());
 
 		//过滤无效分区
 		final Broadcast<List<Tuple2<Member, Long>>> bfiltered = context.broadcast(filtered);
@@ -144,6 +144,7 @@ public class BucCalculator {
 
 		//执行其余格点
 		BucCalculator.preOrderTraverse(context, data, node.getLeft(), outputDir); //先执行子节点
+		data.unpersist();
 		BucCalculator.preOrderTraverse(context, input, node.getRight(), outputDir); //执行兄弟节点
 	}
 
