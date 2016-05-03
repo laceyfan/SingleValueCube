@@ -97,6 +97,20 @@ public class Member implements Comparable<Member>, Serializable {
 	}
 	
 	/**
+	 * 判断当前记录是否能由给定记录的泛化输出。
+	 * @param other 潜在的父记录。
+	 * @return true为存在泛化关系，反之为false。
+	 */
+	public boolean isChildOf(Member other) {
+		for (int i = 0; i < this.dimensions.length; i++) {
+			if (!this.dimensions[i].equals("*") && !this.dimensions[i].equals(other.dimensions[i])) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
 	 * 缓存当前实例的hash值。
 	 */
 	private int hashCode = 0;

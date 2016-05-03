@@ -13,6 +13,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.broadcast.Broadcast;
 
@@ -82,7 +83,7 @@ public class BucCalculator {
 				String[] fields = t.split("\\|");
 				int width = bWidth.value();
 				Member member = new Member(Arrays.copyOf(fields, width), bFromMark.value());
-				long quantity = Long.parseLong(fields[width]);
+				long quantity = 1L;
 				return new Tuple2<Member, Long>(member, quantity);
 			}
 
@@ -109,12 +110,20 @@ public class BucCalculator {
 				return new Tuple2<Member, Long>(m, t._2());
 			}
 			
+		}).reduceByKey(new Function2<Long, Long, Long>() {
+
+			private static final long serialVersionUID = 1L;
+
+			public Long call(Long v1, Long v2) throws Exception {
+				return v1 + v2;
+			}
+			
 		}).filter(new Function<Tuple2<Member, Long>, Boolean>() {
 
 			private static final long serialVersionUID = 1L;
 
 			public Boolean call(Tuple2<Member, Long> t) throws Exception {
-				return t._2() > 0L;
+				return t._2() > 100L;
 			}
 			
 		}).collect();
@@ -132,7 +141,7 @@ public class BucCalculator {
 			public Boolean call(Tuple2<Member, Long> t) throws Exception {
 				List<Tuple2<Member, Long>> list = bfiltered.value();
 				for (Tuple2<Member, Long> element : list) {
-					if (element._1().equals(t._1())) {
+					if (element._1().isChildOf(t._1())) {
 						return true;
 					}
 				}
@@ -140,11 +149,11 @@ public class BucCalculator {
 			}
 			
 		}).cache();
-		bfiltered.destroy();
 
 		//执行其余格点
 		BucCalculator.preOrderTraverse(context, data, node.getLeft(), outputDir); //先执行子节点
 		data.unpersist();
+		bfiltered.destroy();
 		BucCalculator.preOrderTraverse(context, input, node.getRight(), outputDir); //执行兄弟节点
 	}
 
