@@ -21,9 +21,9 @@ public class UniformGenerator20M implements IDataGenerator {
 
 	public void create4D(PrintWriter pw) {
 		for (int a = 1; a <= 10; a++) {
-			for (int b = 1; b <= 20; b++) {
+			for (int b = 1; b <= 100; b++) {
 				for (int c = 1; c <= 100; c++) {
-					for (int d = 1; d <= 1000; d++) {
+					for (int d = 1; d <= 200; d++) {
 						pw.println(String.format("%d|%d|%d|%d|1|", a, b, c, d));
 					}
 				}
