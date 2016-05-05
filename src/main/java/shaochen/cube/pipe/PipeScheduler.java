@@ -13,12 +13,9 @@ import org.apache.commons.cli.ParseException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
 
 import shaochen.cube.plan.BinaryTree;
 import shaochen.cube.plan.LatticeIO;
-import shaochen.cube.plan.LatticeSampler;
 import shaochen.cube.plan.PlanIO;
 import shaochen.cube.util.MetaInfo;
 
@@ -31,9 +28,8 @@ public class PipeScheduler {
 
 	private static Options createCmdOptions() {
 		Option input = new Option("i", true, "数据文件路径"); input.setArgName("inputPath");
-		Option dims = new Option("d", true, "维度数量"); dims.setArgName("dimensionCount");
 		Option output = new Option("o", true, "结果保存路径"); output.setArgName("outputPath");
-		return new Options().addOption(input).addOption(dims).addOption(output);
+		return new Options().addOption(input).addOption(output);
 	}
 	
 	private static void printHelp(Options options) {
@@ -52,22 +48,9 @@ public class PipeScheduler {
 			return;
 		}
 		String inputPath = cmd.getOptionValue("i");
-		int dimensionCount = Integer.parseInt(cmd.getOptionValue("d"));
 
-		//配置Spark上下文
-		StringBuilder appName = new StringBuilder("PipeScheduler").append(" -i " + inputPath);
-		SparkConf conf = new SparkConf().setAppName(appName.toString());
-		JavaSparkContext context = new JavaSparkContext(conf);
-
-		//读取执行计划
-		Map<Integer, Long> cuboids = null;
-		if (inputPath.startsWith("hdfs://")) {
-			cuboids = LatticeSampler.estimateCuboidSize(context, inputPath, dimensionCount); //估算格点成本
-		} else {
-			cuboids = LatticeIO.loadFrom(inputPath);
-		}
-		
 		//划分搜索格
+		Map<Integer, Long> cuboids = LatticeIO.loadFrom(inputPath);
 		long threshold = PipeScheduler.calculateDivisionThreshold(inputPath); //计算炸裂阈值
 		BinaryTree<shaochen.cube.plan.Cuboid> pipelines = LineCluster.createPipeLines(cuboids, threshold); //生成pipelines划分方案
 
@@ -78,7 +61,6 @@ public class PipeScheduler {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		context.close();
 	}
 	
 	/**

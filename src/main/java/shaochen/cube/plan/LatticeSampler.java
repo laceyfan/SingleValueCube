@@ -40,14 +40,10 @@ public class LatticeSampler {
 	 * 在抽样给定数据集上估算出搜索格上各聚集操作的结果大小。
 	 * @param context Spark程序上下文。
 	 * @param inputPath 数据集的存储路径。
+	 * @param fraction 抽样比例。
 	 * @param dimensionCount 维度数量。
 	 * @return 不同聚集任务的结果大小。
 	 */
-	public static Map<Integer, Long> estimateCuboidSize(JavaSparkContext context, String inputPath, int dimensionCount) {
-		double fraction = LatticeSampler.calculateSampleFraction(context, inputPath);
-		return LatticeSampler.estimateCuboidSize(context, inputPath, fraction, dimensionCount);
-	}
-	
 	private static Map<Integer, Long> estimateCuboidSize(JavaSparkContext context, String inputPath, double fraction, int dimensionCount) {
 		Map<Integer, Long> map = new HashMap<Integer, Long>();
 		
